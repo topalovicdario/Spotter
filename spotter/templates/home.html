@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        padding: 60px 20px;
+    }
+
+    .hero-title {
+        font-size: 72px;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 24px;
+        letter-spacing: -3px;
+        background: linear-gradient(135deg, var(--text-light), var(--primary-teal), var(--primary-pink));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientShift 3s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { filter: hue-rotate(0deg); }
+        50% { filter: hue-rotate(20deg); }
+    }
+
+    .hero-subtitle {
+        font-size: 24px;
+        color: var(--text-muted);
+        margin-bottom: 48px;
+        max-width: 600px;
+        line-height: 1.6;
+        font-weight: 400;
+    }
+
+    .hero-cta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-hero {
+        padding: 18px 40px;
+        border-radius: 100px;
+        font-size: 16px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 2px solid;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 8px 24px rgba(0, 217, 192, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(0, 217, 192, 0.5);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-light);
+        border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background: var(--card-bg);
+        border-color: var(--primary-teal);
+        transform: translateY(-4px);
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 32px;
+        margin-top: 80px;
+        max-width: 1200px;
+    }
+
+    .feature-card {
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 24px;
+        padding: 40px 32px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary-teal);
+        box-shadow: 0 20px 40px rgba(0, 217, 192, 0.15);
+    }
+
+    .feature-icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+    }
+
+    .feature-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 12px;
+    }
+
+    .feature-desc {
+        font-size: 15px;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 42px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+        }
+
+        .btn-hero {
+            padding: 14px 28px;
+            font-size: 14px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">Dobrodošli na Spotter</h1>
+
+    {% if user.is_authenticated %}
+        <p class="hero-subtitle">Pozdrav, {{ user.username }}! Nastavi svoj fitness put.</p>
+
+        <div class="hero-cta">
+            {% if user.role == 'CLIENT' %}
+                <a href="{% url 'mycards' %}" class="btn-hero btn-primary">Moji Oglasi</a>
+                <a href="{% url 'allPlans' %}" class="btn-hero btn-secondary">Moji Treninzi</a>
+            {% elif user.role == 'TRAINER' %}
+                <a href="{% url 'card_list' %}" class="btn-hero btn-primary">Oglasi</a>
+                <a href="{% url 'allPlans' %}" class="btn-hero btn-secondary">Moji Klijenti</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p class="hero-subtitle">Tvoj put do boljeg zdravlja počinje ovdje. Pronađi savršenog trenera ili ponudi svoje usluge.</p>
+
+        <div class="hero-cta">
+            <a href="{% url 'register' %}" class="btn-hero btn-primary">Registruj se</a>
+            <a href="{% url 'login' %}" class="btn-hero btn-secondary">Prijavi se</a>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Postavi Cilj</h3>
+                <p class="feature-desc">Definiši svoje fitness ciljeve i pronađi trenera koji ti može pomoći</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💪</div>
+                <h3 class="feature-title">Personalizirano</h3>
+                <p class="feature-desc">Dobij prilagođen plan treninga i ishrane kreiran za tebe</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3 class="feature-title">Prati Napredak</h3>
+                <p class="feature-desc">Komuniciraj sa trenerom i prati svoj napredak svaki dan</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

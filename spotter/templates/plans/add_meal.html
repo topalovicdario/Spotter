@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj Obrok{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --dark-bg: #1a1a2e;
+        --card-bg: #16213e;
+        --accent-green: #00b894;
+        --text-light: #f5f5f5;
+        --text-muted: #b2bec3;
+        --border-color: #2d3a5e;
+    }
+
+    .form-wrapper {
+        background: var(--dark-bg);
+        min-height: 60vh;
+        border-radius: 12px;
+        margin: -24px -12px;
+        padding: 40px 30px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .form-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 560px;
+    }
+
+    .form-container h1 {
+        color: var(--text-light);
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+    }
+
+    .form-subtitle {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 24px;
+    }
+
+    .form-field {
+        margin-bottom: 16px;
+    }
+
+    .form-field label {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+        width: 100%;
+        padding: 12px 14px;
+        background: var(--dark-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus {
+        border-color: var(--accent-green);
+    }
+
+    .form-field textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .form-field select {
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23b2bec3' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 36px;
+    }
+
+    .form-field select option {
+        background: var(--card-bg);
+        color: var(--text-light);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+    }
+
+    .btn-submit {
+        background: var(--accent-green);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+        background: #00a381;
+    }
+
+    .btn-back {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+        border-color: var(--text-muted);
+        color: var(--text-light);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="form-container">
+        <h1>Dodaj Obrok</h1>
+        <p class="form-subtitle">Dodajte obrok za dnevni plan.</p>
+
+        <form method="POST" action="{% url 'addmeal' daily_plan.pk %}">
+            {% csrf_token %}
+
+            <div class="form-field">
+                <label for="mealType">Tip obroka</label>
+                <select name="mealType" id="mealType" required>
+                    <option value="" disabled selected>Odaberite tip obroka</option>
+                    <option value="BREAKFAST">Dorucak</option>
+                    <option value="BRUNCH">Brunch</option>
+                    <option value="LUNCH">Rucak</option>
+                    <option value="SNACK">Uzina</option>
+                    <option value="DINNER">Vecera</option>
+                    <option value="SUPPER">Kasna vecera</option>
+                    <option value="DESSERT">Desert</option>
+                    <option value="DRINK">Pice</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="name">Naziv obroka</label>
+                <input type="text" name="name" id="name" placeholder="npr. Piletina s risom" required>
+            </div>
+
+            <div class="form-field">
+                <label for="description">Opis</label>
+                <textarea name="description" id="description" placeholder="Sastojci, priprema, napomene..."></textarea>
+            </div>
+
+            <div class="form-field">
+                <label for="calories">Kalorije (kcal)</label>
+                <input type="number" name="calories" id="calories" placeholder="npr. 450" min="0" required>
+            </div>
+
+            <div class="form-field">
+                <label for="image_url">Slika URL (opcionalno)</label>
+                <input type="url" name="image_url" id="image_url" placeholder="https://example.com/slika.jpg">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Dodaj Obrok</button>
+                <a href="{% url 'detailplan' daily_plan.plan.pk %}" class="btn-back">Natrag</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

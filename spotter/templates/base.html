@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Spotter{% endblock %}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-teal: #00D9C0;
+            --primary-coral: #FF6B6B;
+            --primary-pink: #FF6BAF;
+            --dark-bg: #0A0A0A;
+            --card-bg: #1A1A2E;
+            --text-light: #F8F9FA;
+            --text-muted: #B0B0B0;
+            --border-color: #2A2A3E;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAVIGATION */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: transparent;
+            z-index: 1000;
+            padding: 20px 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-light);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+
+        .nav-brand:hover {
+            color: var(--primary-teal);
+            transform: scale(1.05);
+        }
+
+        .menu-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 16px;
+            cursor: pointer;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            z-index: 1001;
+            position: relative;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-teal);
+            transform: translateY(-2px);
+        }
+
+        .menu-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-light);
+            transition: all 0.3s;
+        }
+
+        nav.active .menu-toggle {
+            background: var(--text-light);
+            border-color: var(--text-light);
+        }
+
+        nav.active .menu-toggle svg {
+            fill: var(--dark-bg);
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--dark-bg) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            z-index: 999;
+        }
+
+        nav.active .menu-overlay {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .menu-links a, .menu-links button {
+            font-size: 60px;
+            font-weight: 700;
+            color: var(--text-light);
+            text-decoration: none;
+            border-bottom: 6px solid transparent;
+            transition: all 0.3s;
+            padding: 10px 0;
+            background: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -1px;
+            position: relative;
+        }
+
+        .menu-links a:hover, .menu-links button:hover {
+            color: var(--text-light);
+            border-bottom-color: var(--primary-teal);
+        }
+
+        .menu-links a.active {
+            border-bottom-color: var(--primary-teal);
+        }
+
+        .menu-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink));
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        .menu-links .user-info {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 20px;
+            border-bottom: none !important;
+        }
+
+        .menu-links .user-info:hover {
+            transform: none;
+            border-bottom: none !important;
+            color: var(--text-muted);
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            padding-top: 80px;
+            width: 100%;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 30px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 20px;
+            }
+
+            .nav-brand {
+                font-size: 20px;
+            }
+
+            .menu-links a, .menu-links button {
+                font-size: 32px;
+            }
+
+            .menu-links .user-info {
+                font-size: 18px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <nav id="mainNav">
+        <div class="nav-container">
+            <a href="/" class="nav-brand">SPOTTER</a>
+            <button class="menu-toggle" onclick="toggleMenu()">
+                <svg viewBox="0 0 24 24">
+                    <rect width="24" height="3" y="6"/>
+                    <rect width="24" height="3" y="11"/>
+                    <rect width="24" height="3" y="16"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="menu-overlay">
+            <div class="menu-links">
+                {% if request.user.is_authenticated %}
+                    <a href="/">Početna</a>
+
+                    {% if request.user.role == 'CLIENT' %}
+                        <a href="{% url 'mycards' %}">Moji Oglasi</a>
+                        <a href="{% url 'allPlans' %}">Moji Treninzi</a>
+                    {% endif %}
+
+                    {% if request.user.role == 'TRAINER' %}
+                        <a href="{% url 'card_list' %}">Oglasi</a>
+                        <a href="{% url 'allPlans' %}">Moji Klijenti</a>
+                        <a href="{% url 'portfolio' request.user.id %}">Portfolio</a>
+                    {% endif %}
+
+                    <span class="user-info">{{ request.user.username }}</span>
+
+                    <form action="{% url 'logout' %}" method="post" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit">Odjava</button>
+                    </form>
+                {% else %}
+                    <a href="/">Početna</a>
+                    <a href="{% url 'login' %}">Prijava</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer>
+        © 2026 Spotter - Fitness Training Platform
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const nav = document.getElementById('mainNav');
+            nav.classList.toggle('active');
+        }
+
+        // Set active link based on current path
+        function setActiveLink() {
+            const currentPath = window.location.pathname;
+            const menuLinks = document.querySelectorAll('.menu-links a');
+
+            menuLinks.forEach(link => {
+                const linkPath = new URL(link.href).pathname;
+
+                // Remove active class from all links
+                link.classList.remove('active');
+
+                // Add active class to matching link
+                if (currentPath === linkPath) {
+                    link.classList.add('active');
+                } else if (linkPath !== '/' && currentPath.startsWith(linkPath)) {
+                    // Handle sub-paths (e.g., /cards/1 should highlight /cards)
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.menu-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mainNav').classList.remove('active');
+            });
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('mainNav').classList.remove('active');
+            }
+        });
+
+        // Set active link on page load
+        window.addEventListener('DOMContentLoaded', setActiveLink);
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

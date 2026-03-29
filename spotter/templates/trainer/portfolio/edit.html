@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+
+{% block title %}Uredi Portfolio{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-teal: #00D9C0;
+        --primary-coral: #FF6B6B;
+        --primary-pink: #FF6BAF;
+        --primary-orange: #FF8A5C;
+        --primary-blue: #4ECDC4;
+        --dark-bg: #0A0A0A;
+        --card-bg: #1A1A2E;
+        --text-light: #F8F9FA;
+        --text-muted: #B0B0B0;
+        --border-color: #2A2A3E;
+    }
+
+    .edit-wrapper {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 40px 0 80px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 32px;
+        transition: all 0.3s;
+    }
+
+    .back-link:hover {
+        color: var(--primary-teal);
+        transform: translateX(-4px);
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 48px;
+        position: relative;
+        padding: 40px 0;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink), var(--primary-coral));
+        border-radius: 3px;
+    }
+
+    .page-title {
+        font-size: 48px;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 12px;
+        letter-spacing: -2px;
+    }
+
+    .page-subtitle {
+        font-size: 16px;
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    .form-card {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 28px;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink));
+    }
+
+    .form-field {
+        margin-bottom: 28px;
+    }
+
+    .form-field:last-of-type {
+        margin-bottom: 36px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary-teal);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .form-label-hint {
+        display: block;
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        margin-top: 4px;
+    }
+
+    .form-input,
+    .form-textarea {
+        width: 100%;
+        padding: 16px 20px;
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        color: var(--text-light);
+        font-size: 15px;
+        font-family: 'Inter', sans-serif;
+        outline: none;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+        border-color: var(--primary-teal);
+        background: rgba(0, 217, 192, 0.05);
+        box-shadow: 0 0 0 4px rgba(0, 217, 192, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 140px;
+        line-height: 1.7;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: flex-end;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+        color: white;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 100px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 4px 12px rgba(0, 217, 192, 0.2);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(0, 217, 192, 0.4);
+    }
+
+    .btn-cancel {
+        background: transparent;
+        color: var(--text-muted);
+        border: 2px solid var(--border-color);
+        padding: 14px 32px;
+        border-radius: 100px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    .btn-cancel:hover {
+        border-color: var(--text-muted);
+        color: var(--text-light);
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 36px;
+        }
+
+        .form-card {
+            padding: 28px 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn-save,
+        .form-actions .btn-cancel {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-wrapper">
+
+    <a href="{% url 'portfolio' trainer.id %}" class="back-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Natrag na portfolio
+    </a>
+
+    <div class="page-header">
+        <h1 class="page-title">Uredi Portfolio</h1>
+        <p class="page-subtitle">Popuni podatke o sebi da te klijenti bolje upoznaju</p>
+    </div>
+
+    <div class="form-card">
+        <form method="POST" action="{% url 'editPortfolio' trainer.id %}">
+            {% csrf_token %}
+
+            <div class="form-field">
+                <label class="form-label">
+                    Profesija
+                    <span class="form-label-hint">Npr. Personal Trainer, Fitness Coach, Nutricionista...</span>
+                </label>
+                <input type="text" name="profession" class="form-input"
+                       value="{% if portfolio %}{{ portfolio.profession }}{% endif %}"
+                       placeholder="Unesi svoju profesiju" required>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label">
+                    O meni (Bio)
+                    <span class="form-label-hint">Kratki opis o sebi, pristupu treniranju i filozofiji</span>
+                </label>
+                <textarea name="bio" class="form-textarea"
+                          placeholder="Opisi sebe i svoj pristup treniranju..." required>{% if portfolio %}{{ portfolio.bio }}{% endif %}</textarea>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label">
+                    Iskustvo
+                    <span class="form-label-hint">Radno iskustvo, certifikati, godine rada u industriji</span>
+                </label>
+                <textarea name="experience" class="form-textarea"
+                          placeholder="Opisi svoje iskustvo u fitness industriji..." required>{% if portfolio %}{{ portfolio.experience }}{% endif %}</textarea>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label">
+                    Edukacija
+                    <span class="form-label-hint">Fakultet, kursevi, licence i dodatne edukacije</span>
+                </label>
+                <textarea name="education" class="form-textarea"
+                          placeholder="Navedi svoju edukaciju i kvalifikacije..." required>{% if portfolio %}{{ portfolio.education }}{% endif %}</textarea>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label">
+                    URL profilne slike
+                    <span class="form-label-hint">Unesi link od svoje slike...</span>
+                </label>
+                <input type="text" name="profile_image_url" class="form-input"
+                       value="{% if portfolio %}{{ portfolio.profile_image_url }}{% endif %}"
+                       placeholder="Unesi svoju profesiju" required>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'portfolio' trainer.id %}" class="btn-cancel">Odustani</a>
+                <button type="submit" class="btn-save">Spremi Portfolio</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

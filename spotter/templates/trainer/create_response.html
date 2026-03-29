@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+
+{% block title %}Javi se na oglas{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-teal: #00D9C0;
+        --primary-coral: #FF6B6B;
+        --primary-pink: #FF6BAF;
+        --primary-orange: #FF8A5C;
+        --dark-bg: #0A0A0A;
+        --card-bg: #1A1A2E;
+        --text-light: #F8F9FA;
+        --text-muted: #B0B0B0;
+        --border-color: #2A2A3E;
+    }
+
+    .create-response-wrapper {
+        min-height: 70vh;
+        padding: 60px 0 80px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 60px;
+        position: relative;
+        padding: 40px 0;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink), var(--primary-coral));
+        border-radius: 3px;
+    }
+
+    .page-title {
+        font-size: 56px;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 16px;
+        letter-spacing: -2px;
+    }
+
+    .page-subtitle {
+        font-size: 18px;
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    .section-title {
+        color: var(--text-light);
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        position: relative;
+        display: inline-block;
+        letter-spacing: -0.5px;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-pink), var(--primary-coral));
+        border-radius: 3px;
+    }
+
+    .card-info-box {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 28px;
+        padding: 32px;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-info-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-orange), var(--primary-pink));
+    }
+
+    .info-row {
+        margin-bottom: 20px;
+    }
+
+    .info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-row strong {
+        color: var(--primary-teal);
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .info-row p {
+        color: var(--text-light);
+        font-size: 15px;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .form-box {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 28px;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink));
+    }
+
+    .form-field {
+        margin-bottom: 28px;
+    }
+
+    .form-field label {
+        display: block;
+        color: var(--text-light);
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-field input,
+    .form-field textarea {
+        width: 100%;
+        padding: 16px 20px;
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        color: var(--text-light);
+        font-size: 15px;
+        outline: none;
+        transition: all 0.3s;
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus {
+        border-color: var(--primary-teal);
+        background: rgba(0, 217, 192, 0.05);
+        box-shadow: 0 0 0 4px rgba(0, 217, 192, 0.1);
+    }
+
+    .form-field textarea {
+        resize: vertical;
+        min-height: 140px;
+    }
+
+    .form-field input::placeholder,
+    .form-field textarea::placeholder {
+        color: var(--text-muted);
+        opacity: 0.6;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary-teal), #00BFA5);
+        color: white;
+        border: none;
+        padding: 16px 40px;
+        border-radius: 100px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 4px 12px rgba(0, 217, 192, 0.2);
+        flex: 1;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(0, 217, 192, 0.4);
+    }
+
+    .btn-cancel {
+        background: transparent;
+        color: var(--text-muted);
+        border: 2px solid var(--border-color);
+        padding: 16px 40px;
+        border-radius: 100px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-cancel:hover {
+        border-color: var(--primary-coral);
+        color: var(--primary-coral);
+        transform: translateY(-3px);
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 36px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-response-wrapper">
+
+    <div class="page-header">
+        <h1 class="page-title">Javi se na oglas</h1>
+        <p class="page-subtitle">Ponudi svoje usluge treniranja klijentu</p>
+    </div>
+
+    <h2 class="section-title">Detalji oglasa</h2>
+    <div class="card-info-box">
+        <div class="info-row">
+            <strong>Problem:</strong>
+            <p>{{ card.problem }}</p>
+        </div>
+        <div class="info-row">
+            <strong>Cilj:</strong>
+            <p>{{ card.goal }}</p>
+        </div>
+        <div class="info-row">
+            <strong>Klijent:</strong>
+            <p>{{ card.client.username }}</p>
+        </div>
+    </div>
+
+    <h2 class="section-title">Tvoja ponuda</h2>
+    <div class="form-box">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-field">
+                <label for="pitch">Tvoj pitch / Ponuda</label>
+                <textarea
+                    id="pitch"
+                    name="pitch"
+                    rows="5"
+                    required
+                    placeholder="Objasni kako možeš pomoći klijentu..."></textarea>
+            </div>
+
+            <div class="form-field">
+                <label for="price_per_day">Cijena po danu (EUR)</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    id="price_per_day"
+                    name="price_per_day"
+                    required
+                    placeholder="npr. 50.00">
+            </div>
+
+            <div class="form-field">
+                <label for="duration_days">Trajanje programa (dani)</label>
+                <input
+                    type="number"
+                    id="duration_days"
+                    name="duration_days"
+                    required
+                    placeholder="npr. 30">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Pošalji ponudu</button>
+                <a href="{% url 'trainerCardDetail' card.pk %}" class="btn-cancel">Odustani</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

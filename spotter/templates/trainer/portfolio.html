@@ -1,0 +1,723 @@
+{% extends 'base.html' %}
+
+{% block title %}Portfolio - {{ trainer.username }} {% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-teal: #00D9C0;
+        --primary-coral: #FF6B6B;
+        --primary-pink: #FF6BAF;
+        --primary-orange: #FF8A5C;
+        --primary-blue: #4ECDC4;
+        --dark-bg: #0A0A0A;
+        --card-bg: #1A1A2E;
+        --text-light: #F8F9FA;
+        --text-muted: #B0B0B0;
+        --border-color: #2A2A3E;
+    }
+
+    .portfolio-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 0 80px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 32px;
+        transition: all 0.3s;
+    }
+
+    .back-link:hover {
+        color: var(--primary-teal);
+        transform: translateX(-4px);
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+        text-align: center;
+        padding: 60px 40px;
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 32px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink), var(--primary-coral));
+    }
+
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 50% 120%, rgba(0, 217, 192, 0.08), transparent 60%);
+        pointer-events: none;
+    }
+
+    .avatar-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-pink));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 28px;
+        font-size: 48px;
+        font-weight: 900;
+        color: white;
+        text-transform: uppercase;
+        box-shadow: 0 8px 32px rgba(0, 217, 192, 0.3);
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .avatar-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        z-index: 1000;
+    }
+    
+    .hero-name {
+        font-size: 48px;
+        font-weight: 900;
+        color: var(--text-light);
+        letter-spacing: -2px;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-profession {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--primary-teal);
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-member-since {
+        font-size: 14px;
+        color: var(--text-muted);
+        font-weight: 500;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-edit-portfolio {
+        display: inline-block;
+        margin-top: 24px;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-coral));
+        color: white;
+        border: none;
+        padding: 12px 32px;
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 4px 12px rgba(255, 138, 92, 0.2);
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-edit-portfolio:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(255, 138, 92, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* STATS GRID */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 24px;
+        padding: 28px 20px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+
+    .stat-card:nth-child(1)::before { background: var(--primary-teal); }
+    .stat-card:nth-child(2)::before { background: var(--primary-coral); }
+    .stat-card:nth-child(3)::before { background: var(--primary-pink); }
+    .stat-card:nth-child(4)::before { background: var(--primary-orange); }
+
+    .stat-card:nth-child(1):hover { border-color: var(--primary-teal); }
+    .stat-card:nth-child(2):hover { border-color: var(--primary-coral); }
+    .stat-card:nth-child(3):hover { border-color: var(--primary-pink); }
+    .stat-card:nth-child(4):hover { border-color: var(--primary-orange); }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 900;
+        letter-spacing: -1px;
+        margin-bottom: 8px;
+    }
+
+    .stat-card:nth-child(1) .stat-value { color: var(--primary-teal); }
+    .stat-card:nth-child(2) .stat-value { color: var(--primary-coral); }
+    .stat-card:nth-child(3) .stat-value { color: var(--primary-pink); }
+    .stat-card:nth-child(4) .stat-value { color: var(--primary-orange); }
+
+    .stat-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* OFFERS BAR */
+    .offers-bar-section {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 24px;
+        padding: 32px;
+        margin-bottom: 40px;
+    }
+
+    .offers-bar-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+    }
+
+    .offers-bar-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .offers-bar {
+        flex: 1;
+        height: 12px;
+        background: var(--dark-bg);
+        border-radius: 100px;
+        overflow: hidden;
+        display: flex;
+    }
+
+    .offers-bar-accepted {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-blue));
+        transition: width 0.8s ease;
+    }
+
+    .offers-bar-declined {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-coral), var(--primary-pink));
+        transition: width 0.8s ease;
+    }
+
+    .offers-legend {
+        display: flex;
+        gap: 24px;
+        margin-top: 16px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .legend-dot.accepted { background: var(--primary-teal); }
+    .legend-dot.declined { background: var(--primary-coral); }
+    .legend-dot.pending { background: var(--primary-orange); }
+
+    /* CONTENT SECTIONS */
+    .content-section {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 28px;
+        padding: 40px;
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+    .content-section:hover {
+        border-color: rgba(0, 217, 192, 0.3);
+    }
+
+    .content-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink));
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .content-section:hover::before {
+        opacity: 1;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-bottom: 20px;
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .section-icon.bio { background: rgba(0, 217, 192, 0.15); }
+    .section-icon.experience { background: rgba(255, 107, 175, 0.15); }
+    .section-icon.education { background: rgba(255, 138, 92, 0.15); }
+
+    .section-text {
+        font-size: 16px;
+        line-height: 1.8;
+        color: var(--text-muted);
+        white-space: pre-line;
+    }
+
+    /* EXAMPLE PLAN SECTION */
+    .plan-example-section {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 28px;
+        padding: 40px;
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .plan-example-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-coral), var(--primary-pink));
+    }
+
+    .plan-example-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+    }
+
+    .plan-example-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-light);
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .plan-example-badge {
+        padding: 8px 16px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        background: rgba(176, 176, 176, 0.15);
+        color: var(--text-muted);
+        border: 2px solid var(--text-muted);
+    }
+
+    .plan-example-card {
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 20px;
+        padding: 28px;
+        transition: all 0.3s;
+    }
+
+    .plan-example-card:hover {
+        border-color: var(--primary-coral);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(255, 107, 107, 0.1);
+    }
+
+    .plan-example-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    .plan-example-desc {
+        font-size: 15px;
+        color: var(--text-muted);
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    .plan-example-meta {
+        display: flex;
+        gap: 24px;
+        padding-top: 16px;
+        border-top: 2px solid var(--border-color);
+    }
+
+    .plan-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .plan-meta-item span {
+        color: var(--primary-teal);
+        font-weight: 800;
+    }
+
+    /* NO PORTFOLIO STATE */
+    .no-portfolio {
+        text-align: center;
+        padding: 100px 40px;
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px dashed var(--border-color);
+        border-radius: 32px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .no-portfolio::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(0, 217, 192, 0.05), transparent 70%);
+        pointer-events: none;
+    }
+
+    .no-portfolio-icon {
+        font-size: 64px;
+        margin-bottom: 24px;
+        opacity: 0.6;
+    }
+
+    .no-portfolio h2 {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-bottom: 12px;
+        letter-spacing: -1px;
+    }
+
+    .no-portfolio p {
+        font-size: 16px;
+        color: var(--text-muted);
+        max-width: 400px;
+        margin: 0 auto 28px;
+        line-height: 1.6;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .hero-name {
+            font-size: 32px;
+        }
+
+        .hero-profession {
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stat-value {
+            font-size: 28px;
+        }
+
+        .content-section,
+        .plan-example-section {
+            padding: 28px;
+        }
+
+        .offers-legend {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .plan-example-meta {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .avatar-circle {
+            width: 90px;
+            height: 90px;
+            font-size: 36px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .hero-section {
+            padding: 40px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portfolio-wrapper">
+
+    {% if request.user.role == 'CLIENT' %}
+    <a href="javascript:history.back()" class="back-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Natrag
+    </a>
+    {% endif %}
+    {% if portfolio %}
+
+        <!-- HERO -->
+        <div class="hero-section">
+            <div class="avatar-circle">
+                <img src="{{ portfolio.profile_image_url }}">
+            </div>
+            <h1 class="hero-name">{{ trainer.username }}</h1>
+            <p class="hero-profession">{{ portfolio.profession }}</p>
+            <p class="hero-member-since">Aktivan {{ timeActive }} dana na platformi</p>
+
+            {% if request.user == trainer %}
+                <a href="{% url 'editPortfolio' trainer.id %}" class="btn-edit-portfolio">
+                    Uredi Portfolio
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ numberOfClients }}</div>
+                <div class="stat-label">Klijenata</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ avgPrice.price_per_day__avg|floatformat:0|default:"0" }}</div>
+                <div class="stat-label">Avg EUR/dan</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ totalOffers|default:"0" }}</div>
+                <div class="stat-label">Ponuda</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ timeActive }}</div>
+                <div class="stat-label">Dana aktivan</div>
+            </div>
+        </div>
+
+        <!-- OFFERS BAR -->
+        <div class="offers-bar-section">
+            <div class="offers-bar-title">Omjer ponuda</div>
+            <div class="offers-bar-container">
+                <div class="offers-bar">
+                    <div class="offers-bar-accepted" style="width: {{ acceptedOffers|default:0 }}%;"></div>
+                    <div class="offers-bar-declined" style="width: {{ rejectedOffers|default:0 }}%;"></div>
+                </div>
+            </div>
+            <div class="offers-legend">
+                <div class="legend-item">
+                    <div class="legend-dot accepted"></div>
+                    Prihvaceno {{ acceptedOffers|floatformat:0|default:"0" }}%
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot declined"></div>
+                    Odbijeno {{ rejectedOffers|floatformat:0|default:"0" }}%
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot pending"></div>
+                    Na cekanju {{ pendingOffers|floatformat:0|default:"0" }}%
+                </div>
+            </div>
+        </div>
+
+        <!-- BIO -->
+        <div class="content-section">
+            <h2 class="section-title">
+                <div class="section-icon bio">&#128100;</div>
+                O meni
+            </h2>
+            <p class="section-text">{{ portfolio.bio }}</p>
+        </div>
+
+        <!-- EXPERIENCE -->
+        <div class="content-section">
+            <h2 class="section-title">
+                <div class="section-icon experience">&#128170;</div>
+                Iskustvo
+            </h2>
+            <p class="section-text">{{ portfolio.experience }}</p>
+        </div>
+
+        <!-- EDUCATION -->
+        <div class="content-section">
+            <h2 class="section-title">
+                <div class="section-icon education">&#127891;</div>
+                Edukacija
+            </h2>
+            <p class="section-text">{{ portfolio.education }}</p>
+        </div>
+
+        <!-- EXAMPLE PLAN -->
+        {% if planExample %}
+        <div class="plan-example-section">
+            <div class="plan-example-header">
+                <h2 class="plan-example-title">
+                    Primjer treninga
+                </h2>
+                <span class="plan-example-badge">Zavrseno</span>
+            </div>
+
+            <div class="plan-example-card">
+                <h3 class="plan-example-name">{{ planExample.description|truncatewords:12 }}</h3>
+                <p class="plan-example-desc">{{ planExample.description }}</p>
+                <div class="plan-example-meta">
+                    <div class="plan-meta-item">
+                        Trajanje: <span>{{ planExample.duration }} dana</span>
+                    </div>
+                    <div class="plan-meta-item">
+                        Dnevnih planova: <span>{{ planExample.dailyplan_set.count }}</span>
+                    </div>
+                    <div class="plan-meta-item">
+                        Kreirano: <span>{{ planExample.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- LAST UPDATE -->
+        <div style="text-align: center; padding: 20px 0; color: var(--text-muted); font-size: 13px; font-weight: 500;">
+            Zadnje azuriranje portfolia: {{ portfolio.last_update|date:"d.m.Y H:i" }}
+        </div>
+
+    {% else %}
+
+        <!-- NO PORTFOLIO -->
+        <div class="hero-section" style="margin-bottom: 40px;">
+            <div class="avatar-circle">
+                {{ response.trainer.username|slice:":1" }}
+            </div>
+            <h1 class="hero-name">{{ trainer.username }}</h1>
+            <p class="hero-member-since">Aktivan {{ timeActive }} dana na platformi</p>
+        </div>
+
+        <div class="no-portfolio">
+            <div class="no-portfolio-icon">&#128203;</div>
+            <h2>Nema portfolia</h2>
+            <p>Ovaj trener jos nije kreirao svoj portfolio. Vratite se kasnije!</p>
+
+            {% if request.user == trainer %}
+                <a href="{% url 'editPortfolio' trainer.id %}" class="btn-edit-portfolio">
+                    Kreiraj Portfolio
+                </a>
+            {% endif %}
+        </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,1275 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalji Plana{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    :root {
+        --primary-teal: #00D9C0;
+        --primary-coral: #FF6B6B;
+        --primary-pink: #FF6BAF;
+        --primary-orange: #FF8A5C;
+        --primary-blue: #4ECDC4;
+        --dark-bg: #0A0A0A;
+        --card-bg: #1A1A2E;
+        --text-light: #F8F9FA;
+        --text-muted: #B0B0B0;
+        --border-color: #2A2A3E;
+    }
+
+    .plan-wrapper {
+        display: flex;
+        min-height: 100vh;
+        gap: 40px;
+        padding: 20px 0;
+        position: relative;
+    }
+
+    .back-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 30px;
+        transition: all 0.3s;
+    }
+
+    .back-link:hover {
+        color: var(--primary-teal);
+        transform: translateX(-4px);
+    }
+
+    /* LEFT SIDEBAR - PLAN INFO */
+    .plan-sidebar {
+        position: sticky;
+        top: 100px;
+        width: 380px;
+        height: fit-content;
+        flex-shrink: 0;
+    }
+
+    .plan-info-card {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.8) 100%);
+        border-radius: 24px;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid var(--border-color);
+    }
+
+    .plan-info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink), var(--primary-coral));
+    }
+
+    .plan-title-main {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-bottom: 20px;
+        letter-spacing: -0.5px;
+        line-height: 1.3;
+    }
+
+    .status-badge-large {
+        padding: 8px 16px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 2px solid;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .status-active {
+        background: rgba(0, 217, 192, 0.1);
+        color: var(--primary-teal);
+        border-color: var(--primary-teal);
+    }
+
+    .status-inactive {
+        background: rgba(255, 107, 107, 0.1);
+        color: var(--primary-coral);
+        border-color: var(--primary-coral);
+    }
+
+    .plan-meta-list {
+        margin: 24px 0;
+    }
+
+    .meta-item {
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .meta-item:last-child {
+        border-bottom: none;
+    }
+
+    .meta-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .meta-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-light);
+    }
+
+    .plan-description {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text-muted);
+        margin: 24px 0;
+    }
+
+    .plan-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .btn-action {
+        padding: 12px 24px;
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-cancel {
+        background: transparent;
+        border-color: var(--primary-coral);
+        color: var(--primary-coral);
+    }
+
+    .btn-cancel:hover {
+        background: var(--primary-coral);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-add-day {
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+        border-color: transparent;
+        color: white;
+    }
+
+    .btn-add-day:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 217, 192, 0.3);
+    }
+    
+
+    /* CANCEL FORM */
+    .cancel-form-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+    }
+
+    .cancel-form-overlay.active {
+        display: flex;
+    }
+
+    .cancel-form-modal {
+        background: var(--card-bg);
+        border: 2px solid var(--primary-coral);
+        border-radius: 32px;
+        padding: 40px;
+        max-width: 500px;
+        width: 90%;
+    }
+
+    .cancel-form-modal h3 {
+        color: var(--primary-coral);
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 24px;
+    }
+
+    .form-field {
+        margin-bottom: 20px;
+    }
+
+    .form-field label {
+        display: block;
+        color: var(--text-light);
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-field textarea {
+        width: 100%;
+        padding: 16px 20px;
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        color: var(--text-light);
+        font-size: 15px;
+        outline: none;
+        transition: all 0.3s;
+        resize: vertical;
+        min-height: 120px;
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-field textarea:focus {
+        border-color: var(--primary-coral);
+        background: rgba(255, 107, 107, 0.05);
+    }
+
+    /* RIGHT SIDE - DAYS CARDS */
+    .days-container {
+        flex: 1;
+        padding: 20px 0;
+    }
+
+    .section-header {
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-bottom: 12px;
+        letter-spacing: -1px;
+    }
+
+    .section-subtitle {
+        font-size: 15px;
+        color: var(--text-muted);
+    }
+
+    .days-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+    }
+
+    @media (max-width: 1400px) {
+        .plan-wrapper {
+            flex-direction: column;
+        }
+
+        .plan-sidebar {
+            position: relative;
+            width: 100%;
+            top: 0;
+        }
+
+        .days-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .days-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* DAY CARDS */
+    .day-card {
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 20px;
+        padding: 32px 24px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .day-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink));
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .day-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--primary-teal);
+        box-shadow: 0 20px 40px rgba(0, 217, 192, 0.15);
+    }
+
+    .day-card:hover::before {
+        opacity: 1;
+    }
+
+    .day-number {
+        font-size: 56px;
+        font-weight: 900;
+        color: var(--text-light);
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        margin-bottom: 12px;
+    }
+
+    .day-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 8px;
+    }
+
+    .day-desc {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    .day-stats {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: auto;
+    }
+
+    .day-stats span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* SLIDE-IN PANEL */
+    .slide-panel-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 2000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .slide-panel-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .slide-panel {
+        position: fixed;
+        top: 0;
+        right: -50%;
+        width: 50%;
+        height: 100%;
+        background: var(--card-bg);
+        z-index: 2001;
+        overflow-y: auto;
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border-left: 2px solid var(--primary-teal);
+    }
+
+    .slide-panel.active {
+        right: 0;
+    }
+
+    .slide-panel::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .slide-panel::-webkit-scrollbar-track {
+        background: var(--dark-bg);
+    }
+
+    .slide-panel::-webkit-scrollbar-thumb {
+        background: var(--primary-teal);
+        border-radius: 4px;
+    }
+
+    .panel-header {
+        position: sticky;
+        top: 0;
+        background: var(--card-bg);
+        padding: 32px;
+        border-bottom: 2px solid var(--border-color);
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .panel-header h4 {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .panel-close {
+        background: transparent;
+        border: 2px solid var(--border-color);
+        color: var(--text-light);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        line-height: 1;
+        padding: 0;
+    }
+
+    .panel-close:hover {
+        background: var(--primary-coral);
+        border-color: var(--primary-coral);
+        transform: rotate(90deg);
+    }
+
+    .panel-content {
+        padding: 32px;
+    }
+
+    .panel-description {
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--text-muted);
+        margin-bottom: 32px;
+        padding: 20px;
+        background: var(--dark-bg);
+        border-radius: 16px;
+        border-left: 4px solid var(--primary-teal);
+    }
+
+    .trainer-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 32px;
+    }
+
+    .btn-small {
+        padding: 10px 20px;
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        border: 2px solid;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-small.edit {
+        background: rgba(255, 138, 92, 0.1);
+        color: var(--primary-orange);
+        border-color: var(--primary-orange);
+    }
+
+    .btn-small.edit:hover {
+        background: var(--primary-orange);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 138, 92, 0.3);
+    }
+
+    .btn-small.add-ex {
+        background: rgba(78, 205, 196, 0.1);
+        color: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+
+    .btn-small.add-ex:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(78, 205, 196, 0.3);
+    }
+
+    .btn-small.add-meal {
+        background: rgba(0, 217, 192, 0.1);
+        color: var(--primary-teal);
+        border-color: var(--primary-teal);
+    }
+
+    .btn-small.add-meal:hover {
+        background: var(--primary-teal);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 217, 192, 0.3);
+    }
+
+    .content-section {
+        margin-bottom: 40px;
+    }
+
+    .content-section-title {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--primary-teal);
+        margin-bottom: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .content-section-title::before {
+        content: '';
+        width: 4px;
+        height: 16px;
+        background: var(--primary-teal);
+        border-radius: 2px;
+    }
+
+    .item-card {
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        transition: all 0.3s;
+    }
+
+    .item-card:hover {
+        border-color: var(--primary-teal);
+        transform: translateX(6px);
+        box-shadow: 0 8px 24px rgba(0, 217, 192, 0.1);
+    }
+
+    .item-info {
+        flex: 1;
+    }
+
+    .item-info h5 {
+        color: var(--text-light);
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .item-info p {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin: 4px 0;
+        line-height: 1.5;
+    }
+
+    .btn-delete {
+        background: transparent;
+        border: 2px solid var(--border-color);
+        color: var(--primary-coral);
+        cursor: pointer;
+        font-size: 16px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .btn-delete:hover {
+        background: var(--primary-coral);
+        border-color: var(--primary-coral);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+        font-size: 15px;
+        background: var(--dark-bg);
+        border-radius: 16px;
+        border: 2px dashed var(--border-color);
+    }
+    .item-info {
+        display: flex;
+        flex-direction: column; 
+    }
+    .video-pill-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;               
+        margin-top: 12px;       
+        padding: 8px 16px;     
+        
+        background: rgba(0, 217, 192, 0.1);
+        border: 1px solid var(--primary-teal);
+        border-radius: 100px;  
+        
+        color: var(--primary-teal);
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;  
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        
+        transition: all 0.3s ease;
+    }
+    .item-info .video-pill-btn {
+        grid-column: 1; 
+        grid-row: auto; 
+        justify-self: start;
+        margin-top: 16px;
+        width: fit-content;
+    }
+
+    .video-pill-btn svg {
+        fill: currentColor;    
+        transition: transform 0.3s ease;
+    }
+
+    .video-pill-btn:hover {
+        background: var(--primary-teal);
+        color: #0A0A0A;     
+        transform: translateY(-2px); 
+        box-shadow: 0 4px 12px rgba(0, 217, 192, 0.3);
+    }
+
+    .video-pill-btn:hover svg {
+        transform: scale(1.1);
+    }
+    @media (min-width: 500px) {
+        .item-card {
+            align-items: center;
+        }
+        
+        .item-info {
+            display: grid;
+            grid-template-areas: 
+                "title image"
+                "meta image"
+                "desc image";
+            grid-template-columns: 1fr 170px;
+            gap: 0 20px;
+        }
+
+    .item-info h5 { grid-area: title; }
+    .item-info p:nth-of-type(1) { grid-area: meta; }
+    .item-info p:nth-of-type(2) { grid-area: desc; }
+    
+    .item-info img {
+        grid-area: image;
+        width: 170px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        border: 1px solid var(--border-color);
+    }
+}
+
+    @media (max-width: 992px) {
+        .slide-panel {
+            width: 70%;
+            right: -70%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .slide-panel {
+            width: 100%;
+            right: -100%;
+        }
+
+        .panel-header {
+            padding: 24px;
+        }
+
+        .panel-header h4 {
+            font-size: 22px;
+        }
+
+        .panel-content {
+            padding: 24px;
+        }
+    }
+
+    /* FLOATING CHAT BUTTON */
+    .floating-chat-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+        border-radius: 50%;
+        border: none;
+        box-shadow: 0 8px 24px rgba(0, 217, 192, 0.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1500;
+        transition: all 0.3s;
+    }
+
+    .floating-chat-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 32px rgba(0, 217, 192, 0.6);
+    }
+
+    .floating-chat-btn svg {
+        width: 28px;
+        height: 28px;
+        fill: white;
+    }
+
+    .chat-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: var(--primary-coral);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--dark-bg);
+    }
+
+    /* CHAT MODAL */
+    .chat-modal {
+        display: none;
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 400px;
+        max-width: calc(100vw - 60px);
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        z-index: 1500;
+        flex-direction: column;
+        max-height: 600px;
+    }
+
+    .chat-modal.active {
+        display: flex;
+    }
+
+    .chat-header {
+        padding: 20px 24px;
+        border-bottom: 2px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-header h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .chat-close {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        transition: color 0.3s;
+    }
+
+    .chat-close:hover {
+        color: var(--primary-coral);
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 400px;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: var(--dark-bg);
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: var(--primary-teal);
+        border-radius: 3px;
+    }
+
+    .chat-bubble {
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .chat-bubble.mine {
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+    }
+
+    .chat-bubble.theirs {
+        background: var(--dark-bg);
+        color: var(--text-light);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        border: 1px solid var(--border-color);
+    }
+
+    .bubble-meta {
+        font-size: 11px;
+        margin-top: 4px;
+        opacity: 0.7;
+    }
+
+    .chat-input {
+        padding: 20px 24px;
+        border-top: 2px solid var(--border-color);
+    }
+
+    .chat-input form {
+        display: flex;
+        gap: 12px;
+    }
+
+    .chat-input input {
+        flex: 1;
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--text-light);
+        padding: 12px 16px;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .chat-input input:focus {
+        border-color: var(--primary-teal);
+    }
+
+    .chat-send-btn {
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+    .chat-send-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 217, 192, 0.3);
+    }
+
+    .alert-toast {
+        background: var(--card-bg);
+        border: 2px solid var(--primary-teal);
+        color: var(--text-light);
+        padding: 16px 24px;
+        border-radius: 16px;
+        margin-bottom: 30px;
+        font-weight: 500;
+    }
+
+    .alert-toast.warning {
+        border-color: var(--primary-orange);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'allPlans' %}" class="back-link">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Natrag na planove
+</a>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert-toast {% if message.tags == 'warning' %}warning{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="plan-wrapper">
+    <!-- LEFT SIDEBAR - PLAN INFO -->
+    <aside class="plan-sidebar">
+        <div class="plan-info-card">
+            {% if plan.isActive %}
+                <span class="status-badge-large status-active">AKTIVAN</span>
+            {% else %}
+                <span class="status-badge-large status-inactive">PREKINUT</span>
+            {% endif %}
+
+            <h1 class="plan-title-main">{{ plan.description|truncatewords:10 }}</h1>
+
+            <div class="plan-meta-list">
+                <div class="meta-item">
+                    <div class="meta-label">Klijent</div>
+                    <div class="meta-value">{{ plan.client.username }}</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Trener</div>
+                    <a href="{% url 'portfolio' plan.trainer.id %}" style="color: var(--primary-teal); text-decoration: none; font-weight: 700;" onclick="event.stopPropagation();">{{ plan.trainer.username }}  </a> 
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Trajanje</div>
+                    <div class="meta-value">{{ plan.duration }} dana</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Kreirano</div>
+                    <div class="meta-value">{{ plan.created_at|date:"d.m.Y" }}</div>
+                </div>
+            </div>
+
+            <p class="plan-description">{{ plan.description }}</p>
+
+            <div class="plan-actions">
+                {% if plan.isActive %}
+                    <button class="btn-action btn-cancel" onclick="toggleCancelModal()">Otkaži Plan</button>
+                {% endif %}
+                {% if request.user == plan.trainer and plan.dailyplan_set.count < 7 and plan.isActive %}
+                    <a href="{% url 'adddailyplan' plan.pk %}" class="btn-action btn-add-day">+ Dodaj Dan</a>
+                {% endif %}
+            </div>
+        </div>
+    </aside>
+
+    <!-- CANCEL MODAL -->
+    {% if plan.isActive %}
+    <div class="cancel-form-overlay" id="cancelModal">
+        <div class="cancel-form-modal">
+            <h3>Otkaži Plan</h3>
+            <form method="POST" action="{% url 'cancelplan' plan.pk %}">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="reason">Razlog otkazivanja</label>
+                    <textarea name="reason" placeholder="Navedi razlog otkazivanja plana..." required></textarea>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button type="submit" class="btn-action btn-cancel" style="background: var(--primary-coral); color: white; border-color: var(--primary-coral);">
+                        Potvrdi otkazivanje
+                    </button>
+                    <button type="button" class="btn-action" style="background: transparent; color: var(--text-muted); border-color: var(--border-color);" onclick="toggleCancelModal()">
+                        Odustani
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- RIGHT SIDE - DAYS CARDS -->
+    <div class="days-container">
+        <div class="section-header">
+            <h2 class="section-title">Dnevni Planovi</h2>
+            <p class="section-subtitle">Klikni na karticu da vidiš detalje treninga i obroka</p>
+        </div>
+
+        <div class="days-grid">
+            {% for dp in daily_plans %}
+                <div class="day-card" onclick="openDayPanel({{ forloop.counter }})">
+                    <div>
+                        <div class="day-number">{{ forloop.counter }}</div>
+                        <h3 class="day-title">Dan {{ forloop.counter }}</h3>
+                        <p class="day-desc">{{ dp.description|truncatewords:8 }}</p>
+                    </div>
+                    <div class="day-stats">
+                        <span>🏋️ {{ dp.exercise_set.count }} vježbi</span>
+                        <span>🍽️ {{ dp.meal_set.count }} obroka</span>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <p>Još nema dnevnih planova</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- SLIDE-IN PANELS (OUTSIDE GRID) -->
+        {% for dp in daily_plans %}
+            <!-- SLIDE-IN PANEL FOR DAY {{ forloop.counter }} -->
+            <div class="slide-panel-overlay" id="panel-overlay-{{ forloop.counter }}" onclick="closeDayPanel({{ forloop.counter }})"></div>
+            <div class="slide-panel" id="panel-{{ forloop.counter }}">
+                    <div class="panel-header">
+                        <h4>Dan {{ forloop.counter }}</h4>
+                        <button class="panel-close" onclick="closeDayPanel({{ forloop.counter }})">×</button>
+                    </div>
+
+                    <div class="panel-content">
+                        <p class="panel-description">{{ dp.description }}</p>
+
+                        {% if request.user == plan.trainer and plan.isActive %}
+                        <div class="trainer-actions">
+                            <a href="{% url 'editdailyplan' dp.pk %}" class="btn-small edit">Uredi Dan</a>
+                            <a href="{% url 'addexercise' dp.pk %}" class="btn-small add-ex">+ Dodaj Vježbu</a>
+                            <a href="{% url 'addmeal' dp.pk %}" class="btn-small add-meal">+ Dodaj Obrok</a>
+                        </div>
+                        {% endif %}
+
+                        <!-- EXERCISES -->
+                        <div class="content-section">
+                            <div class="content-section-title">Vježbe</div>
+                            {% for exercise in dp.exercise_set.all %}
+                                <div class="item-card">
+                                    <div class="item-info">
+                                        <h5>{{ exercise.name }}</h5>
+                                        <p>{{ exercise.sets }} serija × {{ exercise.reps }} ponavljanja</p>
+                                        <p>{{ exercise.description }}</p>
+                                        {% if exercise.video_url %}
+                                            <a href="{{ exercise.video_url }}" target="_blank" class="video-pill-btn">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                                Video Guide
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    {% if request.user == plan.trainer and plan.isActive %}
+                                        <form method="POST" action="{% url 'deleteexercise' exercise.pk %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-delete">✕</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <div class="empty-state">Nema vježbi za ovaj dan</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- MEALS -->
+                        <div class="content-section">
+                            <div class="content-section-title">Obroci</div>
+                            {% for meal in dp.meal_set.all %}
+                                <div class="item-card">
+                                    <div class="item-info">
+                                        <h5>{{ meal.name }}</h5>
+                                        <p>{{ meal.get_mealType_display }} • {{ meal.calories }} kcal</p>
+                                        <p>{{ meal.description }}</p>
+                                        {% if meal.image_url %}
+                                            <img src="{{ meal.image_url }}" alt="{{ meal.name }} image placeholder">
+                                        {% endif %}
+                                    </div>
+                                    {% if request.user == plan.trainer and plan.isActive %}
+                                        <form method="POST" action="{% url 'deletemeal' meal.pk %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-delete">✕</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <div class="empty-state">Nema obroka za ovaj dan</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+        {% endfor %}
+    </div>
+</div>
+
+</div>
+
+<!-- FLOATING CHAT BUTTON -->
+<button class="floating-chat-btn" onclick="toggleChat()">
+    <svg viewBox="0 0 24 24">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+    </svg>
+    <span class="chat-badge">{{ plan.progresscomment_set.count }}</span>
+</button>
+
+<!-- CHAT MODAL -->
+<div class="chat-modal" id="chatModal">
+    <div class="chat-header">
+        <h4>Poruke</h4>
+        <button class="chat-close" onclick="toggleChat()">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        {% for comment in plan.progresscomment_set.all %}
+            {% if comment.author == request.user %}
+                <div class="chat-bubble mine">
+                    {{ comment.comment }}
+                    <div class="bubble-meta">{{ comment.author.username }} • {{ comment.created_at|date:"d.m. H:i" }}</div>
+                </div>
+            {% else %}
+                <div class="chat-bubble theirs">
+                    {{ comment.comment }}
+                    <div class="bubble-meta">{{ comment.author.username }} • {{ comment.created_at|date:"d.m. H:i" }}</div>
+                </div>
+            {% endif %}
+        {% empty %}
+            <div class="empty-state">Nema poruka</div>
+        {% endfor %}
+    </div>
+    {% if plan.isActive %}
+    <div class="chat-input">
+        <form method="POST" action="{% url 'addcomment' plan.pk %}">
+            {% csrf_token %}
+            <input type="text" name="comment" placeholder="Napiši poruku..." required>
+            <button type="submit" class="chat-send-btn">Pošalji</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function openDayPanel(dayNumber) {
+        const overlay = document.getElementById(`panel-overlay-${dayNumber}`);
+        const panel = document.getElementById(`panel-${dayNumber}`);
+
+        if (overlay && panel) {
+            overlay.classList.add('active');
+            // Small delay to trigger transition
+            setTimeout(() => {
+                panel.classList.add('active');
+            }, 10);
+
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeDayPanel(dayNumber) {
+        const overlay = document.getElementById(`panel-overlay-${dayNumber}`);
+        const panel = document.getElementById(`panel-${dayNumber}`);
+
+        if (overlay && panel) {
+            panel.classList.remove('active');
+            // Wait for panel transition before hiding overlay
+            setTimeout(() => {
+                overlay.classList.remove('active');
+            }, 400);
+
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    function toggleCancelModal() {
+        const modal = document.getElementById('cancelModal');
+        modal.classList.toggle('active');
+    }
+
+    function toggleChat() {
+        const modal = document.getElementById('chatModal');
+        modal.classList.toggle('active');
+
+        if (modal.classList.contains('active')) {
+            const chatBox = document.getElementById('chatMessages');
+            if (chatBox) {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+    }
+
+    // Close all panels on ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            // Close cancel modal
+            document.getElementById('cancelModal')?.classList.remove('active');
+
+            // Close chat
+            document.getElementById('chatModal')?.classList.remove('active');
+
+            // Close all day panels
+            document.querySelectorAll('.slide-panel.active').forEach(panel => {
+                const dayNumber = panel.id.replace('panel-', '');
+                closeDayPanel(dayNumber);
+            });
+        }
+    });
+
+    // Close cancel modal on outside click
+    document.getElementById('cancelModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+
+    // Scroll chat to bottom on load
+    window.addEventListener('load', () => {
+        const chatBox = document.getElementById('chatMessages');
+        if (chatBox) {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    });
+</script>
+{% endblock %}

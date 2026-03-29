@@ -1,0 +1,842 @@
+{% extends 'base.html' %}
+
+{% block title %}Moji Planovi{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-teal: #00D9C0;
+        --primary-coral: #FF6B6B;
+        --primary-pink: #FF6BAF;
+        --primary-orange: #FF8A5C;
+        --dark-bg: #0A0A0A;
+        --card-bg: #1A1A2E;
+        --text-light: #F8F9FA;
+        --text-muted: #B0B0B0;
+        --border-color: #2A2A3E;
+    }
+
+    .dashboard-wrapper {
+        min-height: 70vh;
+        padding: 60px 0 80px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 80px;
+        position: relative;
+        padding: 40px 0;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink), var(--primary-coral));
+        border-radius: 3px;
+    }
+
+    .page-title {
+        font-size: 64px;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 20px;
+        letter-spacing: -2px;
+        background: linear-gradient(135deg, var(--text-light), var(--text-muted));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .page-subtitle {
+        font-size: 20px;
+        color: var(--text-muted);
+        font-weight: 400;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .section-title {
+        color: var(--text-light);
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 32px;
+        position: relative;
+        display: inline-block;
+        letter-spacing: -0.5px;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink));
+        border-radius: 3px;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: start;
+    }
+
+    @media (max-width: 1200px) {
+        .dashboard-grid {
+            gap: 60px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+            gap: 60px;
+        }
+
+        .page-title {
+            font-size: 48px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 32px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 36px;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+        }
+    }
+
+    .response-card {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 28px;
+        padding: 32px;
+        margin-bottom: 24px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .response-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink));
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .response-card::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        background: radial-gradient(circle, rgba(0, 217, 192, 0.1) 0%, transparent 70%);
+        transition: width 0.5s, height 0.5s;
+        border-radius: 50%;
+    }
+
+    .response-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary-teal);
+        box-shadow: 0 24px 48px rgba(0, 217, 192, 0.15);
+    }
+
+    .response-card:hover::before {
+        opacity: 1;
+    }
+
+    .response-card:hover::after {
+        width: 300px;
+        height: 300px;
+    }
+
+    .response-card .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .response-card .client-name {
+        color: var(--text-light);
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 6px 0;
+        letter-spacing: -0.3px;
+    }
+
+    .response-card .card-date {
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .response-card .pitch-text {
+        color: var(--text-muted);
+        font-size: 15px;
+        line-height: 1.7;
+        margin: 16px 0;
+    }
+
+    .response-card .card-footer-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 2px solid var(--border-color);
+    }
+
+    .response-card .price-info {
+        color: var(--primary-teal);
+        font-weight: 800;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .response-card .price-info::before {
+        content: '💰';
+        font-size: 20px;
+    }
+
+    .status-badge {
+        padding: 10px 20px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        border: 2px solid;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+    }
+
+    .status-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-accepted {
+        background: rgba(0, 217, 192, 0.15);
+        color: var(--primary-teal);
+        border-color: var(--primary-teal);
+    }
+
+    .status-pending {
+        background: rgba(255, 138, 92, 0.15);
+        color: var(--primary-orange);
+        border-color: var(--primary-orange);
+    }
+
+    .status-declined {
+        background: rgba(255, 107, 107, 0.15);
+        color: var(--primary-coral);
+        border-color: var(--primary-coral);
+    }
+
+    .plan-card {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 28px;
+        padding: 32px;
+        margin-bottom: 24px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: block;
+        color: inherit;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .plan-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-coral), var(--primary-pink));
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .plan-card::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        background: radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, transparent 70%);
+        transition: width 0.5s, height 0.5s;
+        border-radius: 50%;
+    }
+
+    .plan-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary-coral);
+        box-shadow: 0 24px 48px rgba(255, 107, 107, 0.15);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .plan-card:hover::before {
+        opacity: 1;
+    }
+
+    .plan-card:hover::after {
+        width: 300px;
+        height: 300px;
+    }
+
+    .plan-card .plan-title {
+        color: var(--text-light);
+        font-size: 22px;
+        font-weight: 800;
+        margin: 0 0 16px 0;
+        letter-spacing: -0.3px;
+        line-height: 1.3;
+    }
+
+    .plan-card .plan-desc {
+        color: var(--text-muted);
+        font-size: 15px;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    .plan-card .plan-meta {
+        display: flex;
+        gap: 24px;
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 600;
+        padding-top: 16px;
+        border-top: 2px solid var(--border-color);
+    }
+
+    .plan-card .plan-meta span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .plan-card .plan-meta span::before {
+        content: '•';
+        color: var(--primary-coral);
+        font-size: 18px;
+    }
+
+    .plan-card .plan-meta span:first-child::before {
+        content: '📅';
+        font-size: 16px;
+    }
+
+    .plan-card .plan-meta span:last-child::before {
+        content: '⏱️';
+        font-size: 16px;
+    }
+
+    .btn-create-plan {
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 100px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 4px 12px rgba(0, 217, 192, 0.2);
+    }
+
+    .btn-create-plan:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(0, 217, 192, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .create-plan-form {
+        display: none;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 2px solid var(--border-color);
+    }
+
+    .create-plan-form.active {
+        display: block;
+    }
+
+    .form-field {
+        margin-bottom: 20px;
+    }
+
+    .form-field label {
+        display: block;
+        color: var(--text-light);
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-field input,
+    .form-field textarea {
+        width: 100%;
+        padding: 14px 18px;
+        background: var(--dark-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        color: var(--text-light);
+        font-size: 15px;
+        outline: none;
+        transition: all 0.3s;
+        box-sizing: border-box;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus {
+        border-color: var(--primary-teal);
+        background: rgba(0, 217, 192, 0.05);
+    }
+
+    .form-field textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 40px;
+        color: var(--text-muted);
+        background: var(--dark-bg);
+        border-radius: 28px;
+        border: 2px dashed var(--border-color);
+        margin: 20px 0;
+    }
+
+    .empty-state p {
+        font-size: 18px;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .alert-toast {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--primary-teal);
+        color: var(--text-light);
+        padding: 20px 28px;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        font-weight: 500;
+        box-shadow: 0 8px 24px rgba(0, 217, 192, 0.1);
+    }
+
+    .alert-toast.warning {
+        border-color: var(--primary-orange);
+        box-shadow: 0 8px 24px rgba(255, 138, 92, 0.1);
+    }
+
+    /* Filter Tabs */
+    .filter-tabs {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 36px;
+        flex-wrap: wrap;
+        background: var(--dark-bg);
+        padding: 8px;
+        border-radius: 100px;
+        border: 2px solid var(--border-color);
+        width: fit-content;
+    }
+
+    .filter-tab {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        padding: 12px 28px;
+        border-radius: 100px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+    }
+
+    .filter-tab:hover {
+        color: var(--text-light);
+        transform: translateY(-1px);
+    }
+
+    .filter-tab.active {
+        background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 217, 192, 0.3);
+    }
+
+    .plan-card.inactive {
+        opacity: 0.5;
+    }
+
+    .plan-card .status-inactive {
+        background: rgba(255, 107, 107, 0.15);
+        color: var(--primary-coral);
+        border: 2px solid var(--primary-coral);
+        padding: 10px 20px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+    }
+
+    .plan-card .status-active {
+        background: rgba(0, 217, 192, 0.15);
+        color: var(--primary-teal);
+        border: 2px solid var(--primary-teal);
+        padding: 10px 20px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        box-shadow: 0 4px 12px rgba(0, 217, 192, 0.2);
+    }
+
+    .single-column-layout {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .section-container {
+        position: relative;
+    }
+
+    .section-container::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        right: -20px;
+        bottom: -20px;
+        background: linear-gradient(135deg, rgba(0, 217, 192, 0.03), rgba(255, 107, 175, 0.03));
+        border-radius: 32px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .section-container:hover::before {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        {% if request.user.role == 'TRAINER' %}
+            <h1 class="page-title">Moji Klijenti</h1>
+            <p class="page-subtitle">Upravljaj ponudama i programima treninga</p>
+        {% else %}
+            <h1 class="page-title">Moji Treninzi</h1>
+            <p class="page-subtitle">Prati svoj napredak i trening planove</p>
+        {% endif %}
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-toast {% if message.tags == 'warning' %}warning{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if request.user.role == 'TRAINER' %}
+    <!-- TRAINER LAYOUT: Two columns with Responses and Plans -->
+    <div class="dashboard-grid">
+
+        <!-- ==================== LEFT: MY RESPONSES ==================== -->
+        <div class="section-container responses-section">
+            <h2 class="section-title">Moje Ponude</h2>
+
+            <!-- Filter Tabs for Responses -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterResponses('all')">Sve</button>
+                <button class="filter-tab" onclick="filterResponses('ACCEPTED')">Prihvaćeno</button>
+                <button class="filter-tab" onclick="filterResponses('PENDING')">Na čekanju</button>
+                <button class="filter-tab" onclick="filterResponses('DECLINED')">Odbijeno</button>
+            </div>
+
+            {% for response in responses %}
+                <div class="response-card" data-response-status="{{ response.status }}">
+                    <div class="card-header-row">
+                        <div>
+                            <h3 class="client-name">{{ response.card.client.username }}</h3>
+                            <span class="card-date">{{ response.created_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+
+                        {% if response.status == 'ACCEPTED' %}
+                            <span class="status-badge status-accepted">Prihvaceno</span>
+                        {% elif response.status == 'PENDING' %}
+                            <span class="status-badge status-pending">Na cekanju</span>
+                        {% elif response.status == 'DECLINED' %}
+                            <span class="status-badge status-declined">Odbijeno</span>
+                        {% endif %}
+                    </div>
+
+                    <p class="pitch-text">{{ response.pitch|truncatewords:30 }}</p>
+
+                    <div class="card-footer-row">
+                        <span class="price-info">
+                            {{ response.price_per_day }} EUR/dan &middot; {{ response.duration_days }} dana
+                        </span>
+
+                        {% if response.status == 'ACCEPTED' %}
+                            {% if response.plan %}
+                                <span class="status-badge status-accepted">Plan vec kreiran</span>
+                            {% else %}
+                                <button class="btn-create-plan" onclick="toggleForm(this)">Kreiraj Plan</button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Create Plan Inline Form (hidden by default) -->
+                    {% if response.status == 'ACCEPTED' and not response.plan %}
+                        <div class="create-plan-form">
+                            <form method="POST" action="{% url 'createplan' response.pk %}">
+                                {% csrf_token %}
+                                <div class="form-field">
+                                    <label for="description">Opis plana</label>
+                                    <textarea name="description" placeholder="Opisi plan treninga..." required></textarea>
+                                </div>
+                                <div class="form-field">
+                                    <label for="duration">Trajanje (dani)</label>
+                                    <input type="number" name="duration" placeholder="npr. 30" required>
+                                </div>
+                                <button type="submit" class="btn-create-plan" style="margin-top: 8px;">
+                                    Kreiraj Plan
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <p>Nemate jos ponuda.</p>
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- ==================== RIGHT: MY PLANS (TRAINER) ==================== -->
+        <div class="section-container plans-section">
+            <h2 class="section-title">Moji Programi</h2>
+
+            <!-- Filter Tabs for Plans -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterTrainerPlans('all')">Svi</button>
+                <button class="filter-tab" onclick="filterTrainerPlans('active')">Aktivni</button>
+                <button class="filter-tab" onclick="filterTrainerPlans('inactive')">Prekinuti</button>
+            </div>
+
+            {% for plan in plans %}
+                <a href="{% url 'detailplan' plan.pk %}"
+                   class="plan-card {% if not plan.isActive %}inactive{% endif %} trainer-plan-card"
+                   data-plan-status="{% if plan.isActive %}active{% else %}inactive{% endif %}">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <h3 class="plan-title">{{ plan.description|truncatewords:10 }}</h3>
+                        {% if plan.isActive %}
+                            <span class="status-active">Aktivan</span>
+                        {% else %}
+                            <span class="status-inactive">Prekinut</span>
+                        {% endif %}
+                    </div>
+                    <p class="plan-desc">Klijent: {{ plan.client.username }}</p>
+                    <div class="plan-meta">
+                        <span>{{ plan.duration }} dana</span>
+                        <span>{{ plan.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </a>
+            {% empty %}
+                <div class="empty-state">
+                    <p>Nemate jos programa.</p>
+                </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% else %}
+    <!-- CLIENT LAYOUT: Single column with filter tabs -->
+    <div class="single-column-layout">
+        <div class="section-container">
+            <h2 class="section-title">Moji Treninzi</h2>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterPlans('all')">Svi</button>
+                <button class="filter-tab" onclick="filterPlans('active')">Aktivni</button>
+                <button class="filter-tab" onclick="filterPlans('inactive')">Prekinuti</button>
+            </div>
+
+        <!-- Plans List -->
+        {% for plan in plans %}
+    <a href="{% url 'detailplan' plan.pk %}"
+       class="plan-card {% if not plan.isActive %}inactive{% endif %}"
+       data-status="{% if plan.isActive %}active{% else %}inactive{% endif %}">
+        
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+            <h3 class="plan-title" style="margin: 0;">{{ plan.description|truncatewords:10 }}</h3>
+            {% if plan.isActive %}
+                <span class="status-active">Aktivan</span>
+            {% else %}
+                <span class="status-inactive">Prekinut</span>
+            {% endif %}
+        </div>
+
+        <div class="plan-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+            <span style="color: var(--primary-teal); font-weight: 700;">
+                Trener: {{ plan.trainer.username }}
+            </span>
+            
+            <div class="plan-meta" style="font-size: 0.9em; opacity: 0.8;">
+                <span>{{ plan.created_at|date:"d.m.Y" }}</span>
+            </div>
+        </div>
+    </a>
+{% empty %}
+    <div class="empty-state">
+        <p>Nemate još treninga.</p>
+    </div>
+{% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleForm(btn) {
+        const card = btn.closest('.response-card');
+        const form = card.querySelector('.create-plan-form');
+        form.classList.toggle('active');
+        if (form.classList.contains('active')) {
+            btn.textContent = 'Odustani';
+            btn.style.background = '#636e72';
+        } else {
+            btn.textContent = 'Kreiraj Plan';
+            btn.style.background = '';
+        }
+    }
+
+    function filterPlans(filter) {
+        // Update active tab
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Filter plan cards (CLIENT)
+        const planCards = document.querySelectorAll('.plan-card:not(.trainer-plan-card)');
+        planCards.forEach(card => {
+            const status = card.getAttribute('data-status');
+            if (filter === 'all') {
+                card.style.display = 'block';
+            } else if (filter === status) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function filterResponses(status) {
+        // Update active tab
+        event.target.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Filter response cards
+        const responseCards = document.querySelectorAll('.response-card');
+        responseCards.forEach(card => {
+            const cardStatus = card.getAttribute('data-response-status');
+            if (status === 'all') {
+                card.style.display = 'block';
+            } else if (status === cardStatus) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function filterTrainerPlans(filter) {
+        // Update active tab
+        event.target.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Filter trainer plan cards
+        const planCards = document.querySelectorAll('.trainer-plan-card');
+        planCards.forEach(card => {
+            const status = card.getAttribute('data-plan-status');
+            if (filter === 'all') {
+                card.style.display = 'block';
+            } else if (filter === status) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

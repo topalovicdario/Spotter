@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalji Oglasa{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-teal: #00D9C0;
+        --primary-coral: #FF6B6B;
+        --primary-pink: #FF6BAF;
+        --primary-orange: #FF8A5C;
+        --dark-bg: #0A0A0A;
+        --card-bg: #1A1A2E;
+        --text-light: #F8F9FA;
+        --text-muted: #B0B0B0;
+        --border-color: #2A2A3E;
+    }
+
+    .detail-wrapper {
+        min-height: 70vh;
+        padding: 60px 0 80px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 32px;
+        transition: all 0.3s;
+    }
+
+    .back-link:hover {
+        color: var(--primary-teal);
+        transform: translateX(-4px);
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 60px;
+        position: relative;
+        padding: 40px 0;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink), var(--primary-coral));
+        border-radius: 3px;
+    }
+
+    .page-title {
+        font-size: 56px;
+        font-weight: 900;
+        color: var(--text-light);
+        margin-bottom: 16px;
+        letter-spacing: -2px;
+    }
+
+    .alert-toast {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--primary-teal);
+        color: var(--text-light);
+        padding: 20px 28px;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        font-weight: 500;
+        box-shadow: 0 8px 24px rgba(0, 217, 192, 0.1);
+    }
+
+    .card-detail-box {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 28px;
+        padding: 40px;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-detail-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--primary-pink));
+    }
+
+    .status-badge {
+        padding: 10px 20px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        border: 2px solid;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+        margin-bottom: 32px;
+    }
+
+    .status-available {
+        background: rgba(0, 217, 192, 0.15);
+        color: var(--primary-teal);
+        border-color: var(--primary-teal);
+    }
+
+    .status-pending {
+        background: rgba(255, 138, 92, 0.15);
+        color: var(--primary-orange);
+        border-color: var(--primary-orange);
+    }
+
+    .status-closed {
+        background: rgba(176, 176, 176, 0.15);
+        color: var(--text-muted);
+        border-color: var(--text-muted);
+    }
+
+    .info-field {
+        margin-bottom: 28px;
+    }
+
+    .info-label {
+        font-weight: 700;
+        color: var(--primary-teal);
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .info-content {
+        background: var(--dark-bg);
+        padding: 20px 24px;
+        border-radius: 16px;
+        color: var(--text-light);
+        font-size: 16px;
+        line-height: 1.7;
+        border: 2px solid var(--border-color);
+    }
+
+    .btn-respond {
+        background: linear-gradient(135deg, var(--primary-teal), #00BFA5);
+        color: white;
+        border: none;
+        padding: 16px 40px;
+        border-radius: 100px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 4px 12px rgba(0, 217, 192, 0.2);
+        margin-top: 16px;
+    }
+
+    .btn-respond:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(0, 217, 192, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .already-responded-message {
+        background: linear-gradient(135deg, var(--card-bg) 0%, rgba(26, 26, 46, 0.95) 100%);
+        border: 2px solid var(--primary-orange);
+        color: var(--text-light);
+        padding: 20px 28px;
+        border-radius: 20px;
+        margin-top: 24px;
+        font-weight: 600;
+        font-size: 16px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(255, 138, 92, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 36px;
+        }
+
+        .btn-respond {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-wrapper">
+
+    <a href="{% url 'card_list' %}" class="back-link">
+        &larr; Natrag na oglase
+    </a>
+
+    <div class="page-header">
+        <h1 class="page-title">Detalji Oglasa</h1>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-toast">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card-detail-box">
+        <div class="status-badge {% if card.status == 'AVAILABLE' %}status-available{% elif card.status == 'PENDING' %}status-pending{% else %}status-closed{% endif %}">
+            {% if card.status == 'AVAILABLE' %}
+                Aktivno (Tražim trenera)
+            {% elif card.status == 'PENDING' %}
+                U dogovoru (Trener odabran)
+            {% else %}
+                Zatvoreno
+            {% endif %}
+        </div>
+
+        <div class="info-field">
+            <label class="info-label">Problem Klijenta:</label>
+            <div class="info-content">{{ card.problem }}</div>
+        </div>
+
+        <div class="info-field">
+            <label class="info-label">Cilj Klijenta:</label>
+            <div class="info-content">{{ card.goal }}</div>
+        </div>
+
+        {% if not already_responded %}
+            <a href="{% url 'create_response' card.pk %}" class="btn-respond">
+                Javi se na oglas
+            </a>
+        {% else %}
+            <div class="already-responded-message">
+                Već ste se javili na ovaj oglas
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}
