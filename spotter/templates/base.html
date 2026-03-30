@@ -144,6 +144,22 @@
             font-family: 'Inter', sans-serif;
             letter-spacing: -1px;
             position: relative;
+            text-transform: uppercase;
+        }
+
+        .menu-links a, .menu-links button, .menu-links form button {
+            display: inline-block;
+            border: none;
+            border-radius: 0;
+            padding: 10px 0;
+            background: none;
+            color: var(--text-light);
+        }
+
+        .menu-links a:hover, .menu-links button:hover, .menu-links form button:hover {
+            color: var(--primary-teal);
+            border-bottom: 2px solid var(--primary-teal);
+            background: none;
         }
 
         .menu-links a:hover, .menu-links button:hover {
@@ -176,17 +192,29 @@
         }
 
         .menu-links .user-info {
-            font-size: 24px;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-top: 20px;
-            border-bottom: none !important;
+            display: none;
         }
 
-        .menu-links .user-info:hover {
-            transform: none;
-            border-bottom: none !important;
+        .nav-user-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .nav-user-status span {
+            color: var(--text-light);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .nav-user-status svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-light);
         }
 
         /* MAIN CONTENT */
@@ -282,13 +310,24 @@
     <nav id="mainNav">
         <div class="nav-container">
             <a href="/" class="nav-brand">SPOTTER</a>
-            <button class="menu-toggle" onclick="toggleMenu()">
-                <svg viewBox="0 0 24 24">
-                    <rect width="24" height="3" y="6"/>
-                    <rect width="24" height="3" y="11"/>
-                    <rect width="24" height="3" y="16"/>
-                </svg>
-            </button>
+            <div class="nav-user-status-wrapper" style="display:flex; align-items:center; gap:10px;">
+                {% if request.user.is_authenticated %}
+                    <div class="nav-user-status">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 20C6 16.6863 8.68629 14 12 14C15.3137 14 18 16.6863 18 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>{{ request.user.username }}</span>
+                    </div>
+                {% endif %}
+                <button class="menu-toggle" onclick="toggleMenu()">
+                    <svg viewBox="0 0 24 24">
+                        <rect width="24" height="3" y="6"/>
+                        <rect width="24" height="3" y="11"/>
+                        <rect width="24" height="3" y="16"/>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <div class="menu-overlay">
@@ -306,8 +345,6 @@
                         <a href="{% url 'allPlans' %}">Moji Klijenti</a>
                         <a href="{% url 'portfolio' request.user.id %}">Portfolio</a>
                     {% endif %}
-
-                    <span class="user-info">{{ request.user.username }}</span>
 
                     <form action="{% url 'logout' %}" method="post" style="margin: 0;">
                         {% csrf_token %}
