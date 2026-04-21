@@ -6,7 +6,7 @@ class SpotterConfig(AppConfig):
 
     def ready(self):
         import os
-        from django.contrib.auth.models import User
+        from .models import User  # Use custom User model
         # Create superuser on startup if none exists (for development/production setup)
         if not User.objects.filter(is_superuser=True).exists():
             User.objects.create_superuser(
